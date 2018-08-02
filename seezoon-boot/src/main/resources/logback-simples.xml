@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xml>
+ <configuration    scan="true" scanPeriod="1800 seconds" debug="false" >
+    <property name="LOG_HOME" value="./logs" />  
+    <!-- 控制台输出 -->   
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+       <!-- 日志输出编码 -->  
+        <layout class="ch.qos.logback.classic.PatternLayout">   
+             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符--> 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{tid}] %-5level %logger{50} - %msg%n   </pattern>   
+        </layout>   
+    </appender>   
+    <!-- 按照每天生成日志文件 -->   
+    <appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">   
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/seezoon.log.%d{yyyy-MM-dd}</FileNamePattern>   
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>   
+        <layout class="ch.qos.logback.classic.PatternLayout">  
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符--> 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{tid}] %-5level %logger{50} - %msg%n   
+            </pattern>   
+       </layout> 
+        <!--日志文件最大的大小-->
+       <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+         <MaxFileSize>2048MB</MaxFileSize>
+       </triggeringPolicy>
+    </appender>     
+     <appender name="AsyncFile" class="ch.qos.logback.classic.AsyncAppender">
+            <discardingThreshold>0</discardingThreshold>
+            <queueSize>500</queueSize>
+            <appender-ref ref="FILE" />
+       </appender>
+    <logger name="org.apache" level="INFO" />    
+    <logger name="org.springframework" level="ERROR" />  
+    <logger name="io.lettuce" level="ERROR" />  
+    <logger name="io.netty" level="ERROR" />
+    <logger name="org.hibernate" level="ERROR" />    
+    
+   
+	<!-- 开发环境下的日志配置 -->
+    <springProfile name="dev">
+	    <!-- 日志输出级别 -->
+	    <root level="DEBUG">   
+	        <appender-ref ref="STDOUT" />   
+	    </root> 
+    </springProfile>
+    <!-- 测试环境下的日志配置 -->
+    <springProfile name="uat">
+	    <!-- 日志输出级别 -->
+	    <root level="DEBUG">   
+	        <appender-ref ref="FILE" />   
+	    </root> 
+    </springProfile>
+    <!-- 生产环境下的日志配置 -->
+    <springProfile name="prod">
+	    <!-- 日志输出级别 -->
+	    <root level="INFO">   
+	    	<!-- 使用异步日志 -->
+	        <appender-ref ref="AsyncFile" />   
+	    </root> 
+    </springProfile>
+    
+</configuration>
