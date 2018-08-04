@@ -9,7 +9,6 @@
   </parent>
   <artifactId>seezoon-service</artifactId>
   <name>seezoon-service</name>
-  <version>${project.version}</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

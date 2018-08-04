@@ -9,7 +9,6 @@
 		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>seezoon-boot</artifactId>
-	<version>${project.version}</version>
 	<name>seezoon-boot</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
