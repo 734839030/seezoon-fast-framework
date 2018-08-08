@@ -45,16 +45,28 @@
 			<artifactId>druid-spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
-				<groupId>com.github.pagehelper</groupId>
-				<artifactId>pagehelper</artifactId>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper</artifactId>
 		</dependency>
 		<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-text</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
 		</dependency>
 		<dependency>
-				<groupId>com.alibaba</groupId>
-				<artifactId>fastjson</artifactId>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
 		</dependency>
 	</dependencies>
 </project>

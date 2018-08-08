@@ -1,3 +1,5 @@
 1.如果只有application.properties则在生产环境jar平级的config中放入一个对应的application.properties即可；
   或者直接在项目中通过spring profile 配置指定，如果有自定的配置文件在在命令行指定，
 java -jar -Dspring.config.location=config/application.properties,config/seezoon.properties  seezoon-admin-web-1.0.1-SNAPSHOT.jar
+logback-spring.xml,支持spring boot 对logback扩展，默认文件名为logback-spring.xml，如果文件名为logback.xml 则logback启动会有错误日志，但不影响使用；
+原因是spring boot环境还未初始化

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <configuration  scan="true" scanPeriod="1800 seconds" debug="false" >
+ 	<include resource="logback-common.xml" />
+    <logger name="org.apache" level="INFO" />    
+    <logger name="org.springframework" level="ERROR" />  
+    <logger name="io.lettuce" level="ERROR" />  
+    <logger name="io.netty" level="ERROR" />
+    <logger name="org.hibernate" level="ERROR" /> 
+    
+	<!-- 开发环境下的日志配置 -->
+    <springProfile name="dev">
+	    <!-- 日志输出级别 -->
+	    <root level="DEBUG">   
+	        <appender-ref ref="STDOUT" />   
+	    </root> 
+    </springProfile>
+    <!-- 测试环境下的日志配置 -->
+    <springProfile name="uat">
+	    <!-- 日志输出级别 -->
+	    <root level="DEBUG">   
+	        <appender-ref ref="FILE" />   
+	    </root> 
+    </springProfile>
+    <!-- 生产环境下的日志配置 -->
+    <springProfile name="prod">
+	    <!-- 日志输出级别 -->
+	    <root level="INFO">   
+	    	<!-- 使用异步日志 -->
+	        <appender-ref ref="AsyncFile" />   
+	    </root> 
+    </springProfile>
+</configuration>

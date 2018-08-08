@@ -23,6 +23,10 @@
 		<fastjson.version>1.2.47</fastjson.version>
 		<!-- 定时任务 -->
 		<elastic.job.version>2.1.5</elastic.job.version>
+		<common.io.version>2.6</common.io.version>
+		<!-- 模板 -->
+		<freemarker.version>2.3.28</freemarker.version>
+		<commons-codec.version>1.11</commons-codec.version>
 	</properties>
 
 	<dependencyManagement>
@@ -68,10 +72,25 @@
 				<artifactId>elastic-job-lite-spring</artifactId>
 				<version>${elastic.job.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${common.io.version}</version>
+			</dependency>
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>${freemarker.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${commons-codec.version}</version>
+		</dependency>
 		</dependencies>
 	</dependencyManagement>
 
-	
+
 	<modules>
 		<module>seezoon-boot</module>
 		<module>seezoon-service</module>
