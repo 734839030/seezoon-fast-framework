@@ -12,9 +12,9 @@ import com.seezoon.boot.context.utils.MdcUtil;
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass=true)
 @MapperScan(basePackages= {"com.seezoon"},basePackageClasses= {BaseDao.class})
-public class SeezoonBootApplication extends  SpringBootServletInitializer{
+public class SeezoonServiceApplication extends  SpringBootServletInitializer{
 	public static void main(String[] args) {
 		MdcUtil.push();
-		SpringApplication.run(SeezoonBootApplication.class, args);
+		SpringApplication.run(SeezoonServiceApplication.class, args);
 	}
 }

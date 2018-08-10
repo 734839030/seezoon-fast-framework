@@ -1,21 +1,19 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.io.Serializable;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.PageInfo;
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysArea;
-import com.seezoon.framework.modules.system.service.SysAreaService;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysArea;
+import com.seezoon.service.modules.sys.service.SysAreaService;
 
 /**
  * 区域表controller
@@ -29,13 +27,13 @@ public class SysAreaController extends BaseController {
 	@Autowired
 	private SysAreaService sysAreaService;
 
-	@RequiresPermissions("sys:area:qry")
+	@PreAuthorize("hasAuthority('sys:area:qry')")
 	@PostMapping("/qryPage.do")
 	public ResponeModel qryPage(SysArea sysArea) {
 		PageInfo<SysArea> page = sysAreaService.findByPage(sysArea, sysArea.getPage(), sysArea.getPageSize());
 		return ResponeModel.ok(page);
 	}
-	@RequiresPermissions("sys:area:qry")
+	@PreAuthorize("hasAuthority('sys:area:qry')")
 	@RequestMapping("/get.do")
 	public ResponeModel get(@RequestParam Serializable id) {
 		SysArea sysArea = sysAreaService.findById(id);

@@ -1,4 +1,4 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.util.List;
 
@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.file.FileHandlerFactory;
-import com.seezoon.framework.common.utils.BtRemoteValidateResult;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysLoginLog;
-import com.seezoon.framework.modules.system.entity.SysMenu;
-import com.seezoon.framework.modules.system.entity.SysUser;
-import com.seezoon.framework.modules.system.service.SysLoginLogService;
-import com.seezoon.framework.modules.system.service.SysMenuService;
-import com.seezoon.framework.modules.system.service.SysUserService;
-import com.seezoon.framework.modules.system.shiro.ShiroUtils;
-import com.seezoon.framework.modules.system.shiro.User;
+import com.seezoon.admin.common.file.handler.FileHandler;
+import com.seezoon.admin.common.utils.BtRemoteValidateResult;
+import com.seezoon.admin.modules.sys.security.SecurityUtils;
+import com.seezoon.admin.modules.sys.security.User;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysLoginLog;
+import com.seezoon.service.modules.sys.entity.SysMenu;
+import com.seezoon.service.modules.sys.entity.SysUser;
+import com.seezoon.service.modules.sys.service.SysLoginLogService;
+import com.seezoon.service.modules.sys.service.SysMenuService;
+import com.seezoon.service.modules.sys.service.SysUserService;
 
 /**
  * 综合用户信息处理
@@ -37,14 +37,15 @@ public class UserController extends BaseController {
 	private SysMenuService sysMenuService;
 	@Autowired
 	private SysLoginLogService sysLoginLogService;
-
+	@Autowired
+	private FileHandler fileHandler;
 	@PostMapping("/getUserMenus.do")
 	public ResponeModel getUserMenus() {
-		User user = ShiroUtils.getUser();
+		User user = SecurityUtils.getUser();
 		String userId = user.getUserId();
 		List<SysMenu> menus = null;
 		// 系统管理员，拥有最高权限
-		if (ShiroUtils.isSuperAdmin()) {
+		if (SecurityUtils.isSuperAdmin()) {
 			menus = sysMenuService.findShowMenuAll();
 		} else {
 			menus = sysMenuService.findShowMenuByUserId(userId);
@@ -54,16 +55,16 @@ public class UserController extends BaseController {
 
 	@PostMapping("/logout.do")
 	public ResponeModel logout() {
-		ShiroUtils.logout();
+		//SecurityUtils.logout();
 		return ResponeModel.ok();
 	}
 
 	@PostMapping("/getUserInfo.do")
 	public ResponeModel getUserInfo() {
-		String userId = ShiroUtils.getUserId();
+		String userId = SecurityUtils.getUserId();
 		SysUser sysUser = sysUserService.findById(userId);
 		Assert.notNull(sysUser, "用户存在");
-		sysUser.setPhotoFullUrl(FileHandlerFactory.getFullUrl(sysUser.getPhoto()));
+		sysUser.setPhotoFullUrl(fileHandler.getFullUrl(sysUser.getPhoto()));
 		SysLoginLog lastLoginInfo = sysLoginLogService.findLastLoginInfo(userId);
 		if (null != lastLoginInfo) {
 			sysUser.setLastLoginIp(lastLoginInfo.getIp());
@@ -81,19 +82,19 @@ public class UserController extends BaseController {
 		sysUser.setName(user.getName());
 		sysUser.setEmail(user.getEmail());
 		sysUser.setMobile(user.getMobile());
-		sysUser.setId(ShiroUtils.getUserId());
+		sysUser.setId(SecurityUtils.getUserId());
 		int cnt = sysUserService.updateSelective(sysUser);
 		return ResponeModel.ok(cnt);
 	}
 
 	@PostMapping("/checkPassword.do")
 	public BtRemoteValidateResult checkPassword(@RequestParam String oldPassword) {
-		return BtRemoteValidateResult.valid(sysUserService.validatePwd(oldPassword, ShiroUtils.getUserId()));
+		return BtRemoteValidateResult.valid(sysUserService.validatePwd(oldPassword, SecurityUtils.getUserId()));
 	}
 
 	@PostMapping("/updatePwd.do")
 	public ResponeModel updatePwd(@RequestParam String password, @RequestParam String oldPassword) {
-		String userId = ShiroUtils.getUserId();
+		String userId = SecurityUtils.getUserId();
 		if (!sysUserService.validatePwd(oldPassword, userId)) {
 			return ResponeModel.error("原密码错误");
 		}

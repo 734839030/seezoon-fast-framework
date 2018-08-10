@@ -9,4 +9,5 @@ import com.seezoon.service.modules.sys.entity.SysFile;
 @Service
 public class SysFileService extends CrudService<SysFileDao, SysFile>{
 
+	
 }

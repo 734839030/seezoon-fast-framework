@@ -1,4 +1,4 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.util.List;
 import java.util.Map;
@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysDict;
-import com.seezoon.framework.modules.system.service.SysDictService;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysDict;
+import com.seezoon.service.modules.sys.service.SysDictService;
 
 /**
  * 公共字典数据

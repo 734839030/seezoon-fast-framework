@@ -1,10 +1,10 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.io.Serializable;
 import java.util.List;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.PageInfo;
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysRole;
-import com.seezoon.framework.modules.system.service.SysRoleService;
-import com.seezoon.framework.modules.system.service.SysUserService;
-import com.seezoon.framework.modules.system.shiro.ShiroUtils;
-import com.seezoon.framework.modules.system.shiro.User;
+import com.seezoon.admin.modules.sys.security.SecurityUtils;
+import com.seezoon.admin.modules.sys.security.User;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysRole;
+import com.seezoon.service.modules.sys.service.SysRoleService;
 
 @RestController
 @RequestMapping("${admin.path}/sys/role")
@@ -29,7 +28,7 @@ public class SysRoleController extends BaseController {
 	@Autowired
 	private SysRoleService sysRoleService;
 	
-	@RequiresPermissions("sys:role:qry")
+	@PreAuthorize("hasAuthority('sys:role:qry')")
 	@PostMapping("/qryPage.do")
 	public ResponeModel qryPage(SysRole sysRole) {
 		PageInfo<SysRole> page = sysRoleService.findByPage(sysRole, sysRole.getPage(), sysRole.getPageSize());
@@ -38,9 +37,9 @@ public class SysRoleController extends BaseController {
 	
 	@PostMapping("/qryAllWithScope.do")
 	public ResponeModel qryAllWithScope() {
-		User user = ShiroUtils.getUser();
+		User user = SecurityUtils.getUser();
 		String userId = user.getUserId();
-		if (ShiroUtils.isSuperAdmin(userId)) {
+		if (SecurityUtils.isSuperAdmin(userId)) {
 			return this.qryAll();
 		}
 		//如果是非超级管理员返回自己拥有的权限
@@ -55,7 +54,7 @@ public class SysRoleController extends BaseController {
 	public ResponeModel qryAll() {
 		return ResponeModel.ok(this.sysRoleService.findList(null));
 	}
-	@RequiresPermissions("sys:role:qry")
+	@PreAuthorize("hasAuthority('sys:role:qry')")
 	@RequestMapping("/get.do")
 	public ResponeModel get(@RequestParam Serializable id) {
 		SysRole sysRole = sysRoleService.findById(id);
@@ -72,34 +71,34 @@ public class SysRoleController extends BaseController {
 		return ResponeModel.ok(sysRoleService.findDeptIdsByRoleId(roleId));
 	}
 	
-	@RequiresPermissions("sys:role:save")
+	@PreAuthorize("hasAuthority('sys:role:save')")
 	@PostMapping("/save.do")
 	public ResponeModel save(@Validated SysRole sysRole, BindingResult bindingResult) {
 		int cnt = sysRoleService.save(sysRole);
 		return ResponeModel.ok(cnt);
 	}
 
-	@RequiresPermissions("sys:role:update")
+	@PreAuthorize("hasAuthority('sys:role:update')")
 	@PostMapping("/update.do")
 	public ResponeModel update(@Validated SysRole sysRole, BindingResult bindingResult) {
 		int cnt = sysRoleService.updateSelective(sysRole);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:role:update")
+	@PreAuthorize("hasAuthority('sys:role:update')")
 	@PostMapping("/removeUser.do")
 	public ResponeModel removeUser(@RequestParam List<String> userIds,String roleId) {
 		Assert.notEmpty(userIds,"移除用户为空");
 		int cnt = sysRoleService.removeUsersByRoleId(roleId, userIds);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:role:update")
+	@PreAuthorize("hasAuthority('sys:role:update')")
 	@PostMapping("/addUser.do")
 	public ResponeModel addUser(@RequestParam List<String> userIds,String roleId) {
 		Assert.notEmpty(userIds,"移除用户为空");
 		int cnt = sysRoleService.addUsersByRoleId(roleId, userIds);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:role:delete")
+	@PreAuthorize("hasAuthority('sys:role:delete')")
 	@PostMapping("/delete.do")
 	public ResponeModel delete(@RequestParam Serializable id) {
 		int cnt = sysRoleService.deleteById(id);

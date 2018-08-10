@@ -1,4 +1,4 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.io.Serializable;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -18,17 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.file.FileConfig;
-import com.seezoon.framework.common.file.FileHandlerFactory;
-import com.seezoon.framework.common.utils.BtRemoteValidateResult;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysRole;
-import com.seezoon.framework.modules.system.entity.SysUser;
-import com.seezoon.framework.modules.system.service.LoginSecurityService;
-import com.seezoon.framework.modules.system.service.SysRoleService;
-import com.seezoon.framework.modules.system.service.SysUserService;
-import com.seezoon.framework.modules.system.shiro.ShiroUtils;
+import com.seezoon.admin.common.file.handler.FileHandler;
+import com.seezoon.admin.common.utils.BtRemoteValidateResult;
+import com.seezoon.admin.modules.sys.security.SecurityUtils;
+import com.seezoon.admin.modules.sys.service.LoginSecurityService;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysRole;
+import com.seezoon.service.modules.sys.entity.SysUser;
+import com.seezoon.service.modules.sys.service.SysRoleService;
+import com.seezoon.service.modules.sys.service.SysUserService;
 
 @RestController
 @RequestMapping("${admin.path}/sys/user")
@@ -40,21 +39,24 @@ public class SysUserController extends BaseController {
 	private SysRoleService sysRoleService;
 	@Autowired
 	private LoginSecurityService loginSecurityService;
-	@RequiresPermissions("sys:user:qry")
+	@Autowired
+	private FileHandler fileHandler;
+	
+	@PreAuthorize("hasAuthority('sys:user:qry')")
 	@PostMapping("/qryPage.do")
 	public ResponeModel qryPage(SysUser sysUser,HttpServletRequest request) {
 		PageInfo<SysUser> page = sysUserService.findByPage(sysUser, sysUser.getPage(), sysUser.getPageSize());
 		for (SysUser user: page.getList()) {
-			user.setPhotoFullUrl(FileConfig.getFullUrl(user.getPhoto()));
+			user.setPhotoFullUrl(fileHandler.getFullUrl(user.getPhoto()));
 		}
 		return ResponeModel.ok(page);
 	}
-	@RequiresPermissions("sys:user:qry")
+	@PreAuthorize("hasAuthority('sys:user:qry')")
 	@RequestMapping("/get.do")
 	public ResponeModel get(@RequestParam Serializable id) {
 		SysUser sysUser = sysUserService.findById(id);
 		Assert.notNull(sysUser,"用户不存在");
-		sysUser.setPhotoFullUrl(FileHandlerFactory.getFullUrl(sysUser.getPhoto()));
+		sysUser.setPhotoFullUrl(fileHandler.getFullUrl(sysUser.getPhoto()));
 		//用户所拥有的角色
 		List<SysRole> roleList = sysRoleService.findByUserId(sysUser.getId());
 		List<String> roleIds = Lists.newArrayList();
@@ -64,16 +66,16 @@ public class SysUserController extends BaseController {
 		sysUser.setRoleIds(roleIds);
 		return ResponeModel.ok(sysUser);
 	}
-	@RequiresPermissions("sys:user:save")
+	@PreAuthorize("hasAuthority('sys:user:save')")
 	@PostMapping("/save.do")
 	public ResponeModel save(@Validated SysUser sysUser, BindingResult bindingResult) {
 		int cnt = sysUserService.save(sysUser);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:user:update")
+	@PreAuthorize("hasAuthority('sys:user:update')")
 	@PostMapping("/update.do")
 	public ResponeModel update(@Validated SysUser sysUser, BindingResult bindingResult) {
-		if (ShiroUtils.isSuperAdmin(sysUser.getId()) && SysUser.STATUS_STOP.equals(sysUser.getStatus())) {
+		if (SecurityUtils.isSuperAdmin(sysUser.getId()) && SysUser.STATUS_STOP.equals(sysUser.getStatus())) {
 			return ResponeModel.error("超级管理员不允许修改为禁用状态");
 		}
 		//密码为空则不更新
@@ -81,13 +83,13 @@ public class SysUserController extends BaseController {
 		int cnt = sysUserService.updateUserRoleSelective(sysUser);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:user:delete")
+	@PreAuthorize("hasAuthority('sys:user:delete')")
 	@PostMapping("/delete.do")
 	public ResponeModel delete(@RequestParam String id) {
-		if (ShiroUtils.isSuperAdmin(id)) {
+		if (SecurityUtils.isSuperAdmin(id)) {
 			return ResponeModel.error("超级管理员不允许删除");
 		}
-		if (ShiroUtils.getUserId().equals(id)) {
+		if (SecurityUtils.getUserId().equals(id)) {
 			return ResponeModel.error("自己不能删除自己");
 		}
 		int cnt = sysUserService.deleteById(id);
@@ -103,13 +105,13 @@ public class SysUserController extends BaseController {
 			return BtRemoteValidateResult.valid(sysUser == null || sysUser.getId().equals(id));
 		}
 	}
-	@RequiresPermissions("sys:user:update")
+	@PreAuthorize("hasAuthority('sys:user:update')")
 	@PostMapping("/setStatus.do")
 	public ResponeModel setStatus(@RequestParam String id, @RequestParam String status) {
-		if (ShiroUtils.isSuperAdmin(id)) {
+		if (SecurityUtils.isSuperAdmin(id)) {
 			return ResponeModel.error("超级管理员不允许修改");
 		}
-		if (ShiroUtils.getUserId().equals(id)) {
+		if (SecurityUtils.getUserId().equals(id)) {
 			return ResponeModel.error("自己不能修改自己");
 		}
 		SysUser sysUser = new SysUser();
@@ -125,7 +127,7 @@ public class SysUserController extends BaseController {
 	 * @param id
 	 * @return
 	 */
-	@RequiresPermissions("sys:user:update")
+	@PreAuthorize("hasAuthority('sys:user:update')")
 	@PostMapping("/unlock.do")
 	public ResponeModel setStatus(@RequestParam String id) {
 		SysUser findById = sysUserService.findById(id);

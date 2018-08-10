@@ -1,11 +1,11 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.seezoon.framework.common.Constants;
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.utils.TreeHelper;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysDept;
-import com.seezoon.framework.modules.system.service.SysDeptService;
-import com.seezoon.framework.modules.system.shiro.ShiroUtils;
-import com.seezoon.framework.modules.system.shiro.User;
+import com.seezoon.admin.common.utils.TreeHelper;
+import com.seezoon.admin.modules.sys.security.SecurityUtils;
+import com.seezoon.admin.modules.sys.security.User;
+import com.seezoon.boot.common.Constants;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysDept;
+import com.seezoon.service.modules.sys.service.SysDeptService;
 
 @RestController
 @RequestMapping("${admin.path}/sys/dept")
@@ -38,9 +38,9 @@ public class SysDeptController extends BaseController {
 	 */
 	@PostMapping("/qryAllWithScope.do")
 	public ResponeModel qryAllWithScope(SysDept sysDept) {
-		User user = ShiroUtils.getUser();
+		User user = SecurityUtils.getUser();
 		String deptId = user.getDeptId();
-		if (ShiroUtils.isSuperAdmin(user.getUserId())) {
+		if (SecurityUtils.isSuperAdmin(user.getUserId())) {
 			return this.qryAll(sysDept);
 		}
 		//如果是非超级管理员返回自己部门及以下
@@ -60,13 +60,13 @@ public class SysDeptController extends BaseController {
 		//数据机构调整
 		return ResponeModel.ok(treeHelper.treeGridList(list));
 	}
-	@RequiresPermissions("sys:dept:qry")
+	@PreAuthorize("hasAuthority('sys:dept:qry')")
 	@RequestMapping("/get.do")
 	public ResponeModel get(@RequestParam Serializable id) {
 		SysDept sysDept = sysDeptService.findById(id);
 		return ResponeModel.ok(sysDept);
 	}
-	@RequiresPermissions("sys:dept:save")
+	@PreAuthorize("hasAuthority('sys:dept:save')")
 	@PostMapping("/save.do")
 	public ResponeModel save(@Validated SysDept sysDept, BindingResult bindingResult) {
 		SysDept parent = null;
@@ -77,7 +77,7 @@ public class SysDeptController extends BaseController {
 		int cnt = sysDeptService.save(sysDept);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:dept:update")
+	@PreAuthorize("hasAuthority('sys:dept:update')")
 	@PostMapping("/update.do")
 	public ResponeModel update(@Validated SysDept sysDept, BindingResult bindingResult) {
 		SysDept parent = null;
@@ -89,7 +89,7 @@ public class SysDeptController extends BaseController {
 		return ResponeModel.ok(cnt);
 	}
 
-	@RequiresPermissions("sys:dept:delete")
+	@PreAuthorize("hasAuthority('sys:dept:delete')")
 	@PostMapping("/delete.do")
 	public ResponeModel delete(@RequestParam Serializable id) {
 		int cnt = sysDeptService.deleteById(id);

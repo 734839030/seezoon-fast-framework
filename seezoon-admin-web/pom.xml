@@ -11,6 +11,9 @@
 	<artifactId>seezoon-admin-web</artifactId>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- 定时任务 -->
+		<elastic.job.version>2.1.5</elastic.job.version>
+		<aliyun.sdk.oss.version>2.8.2</aliyun.sdk.oss.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -21,6 +24,26 @@
 			<groupId>com.dangdang</groupId>
 			<artifactId>elastic-job-lite-spring</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.aliyun.oss</groupId>
+			<artifactId>aliyun-sdk-oss</artifactId>
+			<version>${aliyun.sdk.oss.version}</version>
+		</dependency>
+		<!-- elastic job -->
+			<dependency>
+				<groupId>com.dangdang</groupId>
+				<artifactId>elastic-job-lite-spring</artifactId>
+				<version>${elastic.job.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-redis</artifactId>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-security</artifactId>
+			</dependency>
 	</dependencies>
 	<!-- 依赖模块不能用spring 插件打包，否则无法依赖成功 -->
 	<build>

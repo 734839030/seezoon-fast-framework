@@ -1,21 +1,21 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.PageInfo;
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.file.FileConfig;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysFile;
-import com.seezoon.framework.modules.system.service.SysFileService;
+import com.seezoon.admin.common.file.handler.FileHandler;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysFile;
+import com.seezoon.service.modules.sys.service.SysFileService;
 
 @RestController
 @RequestMapping("${admin.path}/sys/file")
@@ -23,20 +23,22 @@ public class SysFileController extends BaseController {
 
 	@Autowired
 	private SysFileService sysFileService;
+	@Autowired
+	private FileHandler fileHandler;
 	
-	@RequiresPermissions("sys:file:qry")
+	@PreAuthorize("hasAuthority('sys:file:qry')")
 	@PostMapping("/qryPage.do")
 	public ResponeModel qryPage(SysFile sysFile,@RequestParam(required=false) Date startDate,@RequestParam(required=false) Date endDate) {
 		sysFile.addProperty("startDate", startDate);
 		sysFile.addProperty("endDate", endDate);
 		PageInfo<SysFile> page = sysFileService.findByPage(sysFile, sysFile.getPage(), sysFile.getPageSize());
 		for (SysFile file: page.getList()) {
-			file.setFullUrl(FileConfig.getFullUrl(file.getRelativePath()));
+			file.setFullUrl(fileHandler.getFullUrl(file.getRelativePath()));
 		}
 		return ResponeModel.ok(page);
 	}
 	
-	@RequiresPermissions("sys:file:delete")
+	@PreAuthorize("hasAuthority('sys:file:delete')")
 	@PostMapping("/delete.do")
 	public ResponeModel delete(@RequestParam Serializable id) {
 		int cnt = sysFileService.deleteById(id);

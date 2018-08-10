@@ -12,15 +12,20 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.seezoon.boot.common.dao.BaseDao;
 import com.seezoon.boot.context.utils.MdcUtil;
 
+/**
+ * 加载文件最好写上classpath:/  避免通过class 获取资源相对路径问题
+ * @author hdf
+ *
+ */
 @SpringBootApplication(scanBasePackages= {"com.seezoon"})
 @MapperScan(basePackages= {"com.seezoon"},markerInterface=BaseDao.class)
 @EnableAspectJAutoProxy(proxyTargetClass=true)
 @EnableTransactionManagement(proxyTargetClass=true)
-@PropertySource(value= {"seezoon.properties"})
-@ImportResource(locations= {"elastic-job.xml"})
-public class SeezoonBootApplication extends  SpringBootServletInitializer{
+@PropertySource(value= {"classpath:/seezoon.properties"})
+@ImportResource(locations= {"classpath:/elastic-job.xml"})
+public class SeezoonAdminApplication extends  SpringBootServletInitializer{
 	public static void main(String[] args) {
 		MdcUtil.push();
-		SpringApplication.run(SeezoonBootApplication.class, args);
+		SpringApplication.run(SeezoonAdminApplication.class, args);
 	}
 }

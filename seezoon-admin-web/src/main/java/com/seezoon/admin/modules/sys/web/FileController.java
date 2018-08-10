@@ -1,4 +1,4 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -13,8 +13,6 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -25,17 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Lists;
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.context.exception.ServiceException;
-import com.seezoon.framework.common.file.beans.FileInfo;
-import com.seezoon.framework.common.utils.CodecUtils;
-import com.seezoon.framework.common.utils.IdGen;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysFile;
-import com.seezoon.framework.modules.system.service.FileService;
+import com.seezoon.admin.common.file.beans.FileInfo;
+import com.seezoon.admin.modules.sys.service.FileService;
+import com.seezoon.boot.common.utils.CodecUtils;
+import com.seezoon.boot.common.utils.IdGen;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysFile;
 
 @RestController
-@RequestMapping({"${admin.path}/file","${front.path}/file"})
+@RequestMapping("${admin.path}/file")
 public class FileController extends BaseController {
 
 	private Pattern pattern = Pattern.compile("^image/.+$");

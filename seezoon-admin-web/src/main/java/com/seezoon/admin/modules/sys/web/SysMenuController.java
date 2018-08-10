@@ -1,11 +1,11 @@
-package com.seezoon.framework.modules.system.web;
+package com.seezoon.admin.modules.sys.web;
 
 import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
-import com.seezoon.framework.common.Constants;
-import com.seezoon.framework.common.context.beans.ResponeModel;
-import com.seezoon.framework.common.utils.TreeHelper;
-import com.seezoon.framework.common.web.BaseController;
-import com.seezoon.framework.modules.system.entity.SysMenu;
-import com.seezoon.framework.modules.system.service.SysMenuService;
+import com.seezoon.admin.common.utils.TreeHelper;
+import com.seezoon.boot.common.Constants;
+import com.seezoon.boot.common.web.BaseController;
+import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.entity.SysMenu;
+import com.seezoon.service.modules.sys.service.SysMenuService;
 
 @RestController
 @RequestMapping("${admin.path}/sys/menu")
@@ -38,13 +38,13 @@ public class SysMenuController extends BaseController {
 		List<SysMenu> list = sysMenuService.findList(sysMenu);
 		return ResponeModel.ok(treeHelper.treeGridList(list));
 	}
-	@RequiresPermissions("sys:menu:qry")
+	@PreAuthorize("hasAuthority('sys:menu:qry')")
 	@RequestMapping("/get.do")
 	public ResponeModel get(@RequestParam Serializable id) {
 		SysMenu sysMenu = sysMenuService.findById(id);
 		return ResponeModel.ok(sysMenu);
 	}
-	@RequiresPermissions("sys:menu:save")
+	@PreAuthorize("hasAuthority('sys:menu:save')")
 	@PostMapping("/save.do")
 	public ResponeModel save(@Validated SysMenu sysMenu, BindingResult bindingResult) {
 		SysMenu parent = null;
@@ -55,7 +55,7 @@ public class SysMenuController extends BaseController {
 		int cnt = sysMenuService.save(sysMenu);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:menu:update")
+	@PreAuthorize("hasAuthority('sys:menu:update')")
 	@PostMapping("/update.do")
 	public ResponeModel update(@Validated SysMenu sysMenu, BindingResult bindingResult) {
 		SysMenu parent = null;
@@ -66,13 +66,13 @@ public class SysMenuController extends BaseController {
 		int cnt = sysMenuService.updateSelective(sysMenu);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:menu:delete")
+	@PreAuthorize("hasAuthority('sys:menu:delete')")
 	@PostMapping("/delete.do")
 	public ResponeModel delete(@RequestParam Serializable id) {
 		int cnt = sysMenuService.deleteById(id);
 		return ResponeModel.ok(cnt);
 	}
-	@RequiresPermissions("sys:menu:save")
+	@PreAuthorize("hasAuthority('sys:menu:save')")
 	@PostMapping("/batchSave.do")
 	public ResponeModel batchSave(@RequestBody List<SysMenu> list ) {
 		//直接用list接收到的json 参数实际上是jsonObject，强转到SysMenu 会报错,下列性能不好，因为不想循环List 转化
