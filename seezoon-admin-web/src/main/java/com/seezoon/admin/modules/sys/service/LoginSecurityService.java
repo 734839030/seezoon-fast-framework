@@ -2,9 +2,10 @@ package com.seezoon.admin.modules.sys.service;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.support.atomic.RedisAtomicLong;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -13,37 +14,34 @@ import com.seezoon.boot.common.service.BaseService;
 
 @Service
 public class LoginSecurityService extends BaseService {
-
-	private RedisTemplate<String, Long> redisTemplate;
+	
+	@Resource(name="redisTemplate")
+	private ValueOperations<String, Long> valueOperations;
 	private String LOCK_PREFIX = "login_cnt_";
 
 	public void unLock(String loginName) {
 		Assert.hasLength(loginName, "loginName 为空");
-		redisTemplate.delete(LOCK_PREFIX + loginName);
+		valueOperations.getOperations().delete(LOCK_PREFIX + loginName);
 	}
 
 	public Long getLoginFailCount(String loginName) {
 		try {
-			// spring data increment 有bug 故采用这种方式
-			RedisAtomicLong counter = new RedisAtomicLong(LOCK_PREFIX + loginName,
-					redisTemplate.getConnectionFactory());
-			return counter.get();
+			return valueOperations.get(LOCK_PREFIX + loginName);
 		} finally {
-			redisTemplate.expire(LOCK_PREFIX + loginName, 24, TimeUnit.HOURS);
+			valueOperations.getOperations().expire(LOCK_PREFIX + loginName, 24, TimeUnit.HOURS);
 		}
 	}
 
 	public Long incrementLoginFailTimes(String loginName) {
 		try {
-			RedisAtomicLong counter = new RedisAtomicLong(LOCK_PREFIX + loginName,
-					redisTemplate.getConnectionFactory());
-			return counter.incrementAndGet();
+			Long increment = valueOperations.increment(LOCK_PREFIX + loginName, 1);
+			return increment;
 		} finally {
-			redisTemplate.expire(LOCK_PREFIX + loginName, 24, TimeUnit.HOURS);
+			valueOperations.getOperations().expire(LOCK_PREFIX + loginName, 24, TimeUnit.HOURS);
 		}
 	}
 
 	public void clearLoginFailTimes(String loginName) {
-		redisTemplate.delete(LOCK_PREFIX + loginName);
+		valueOperations.getOperations().delete(LOCK_PREFIX + loginName);
 	}
 }

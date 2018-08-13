@@ -22,10 +22,12 @@ import com.seezoon.boot.context.utils.MdcUtil;
 @EnableAspectJAutoProxy(proxyTargetClass=true)
 @EnableTransactionManagement(proxyTargetClass=true)
 @PropertySource(value= {"classpath:/seezoon.properties"})
-@ImportResource(locations= {"classpath:/elastic-job.xml"})
+//@ImportResource(locations= {"classpath:/elastic-job.xml"})
 public class SeezoonAdminApplication extends  SpringBootServletInitializer{
 	public static void main(String[] args) {
 		MdcUtil.push();
 		SpringApplication.run(SeezoonAdminApplication.class, args);
 	}
+	
+	
 }
