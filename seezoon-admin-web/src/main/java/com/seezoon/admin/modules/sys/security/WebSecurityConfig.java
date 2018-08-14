@@ -6,12 +6,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,13 +20,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.seezoon.admin.modules.sys.utils.HttpStatus;
-import com.seezoon.service.modules.sys.service.SysUserService;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(proxyTargetClass=true,prePostEnabled=true,securedEnabled=true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Value("${admin.path}")
@@ -34,25 +37,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/public/**").permitAll()
 		.antMatchers((adminPath + "/**")).authenticated()
+		.antMatchers(HttpMethod.OPTIONS).permitAll()//跨域的
 		.and().formLogin().loginProcessingUrl(adminPath + "/login.do").permitAll()//.successHandler(new LoginResultHandler())
+		.and().logout().logoutUrl(adminPath + "/user/logout.do").logoutSuccessHandler(loginResultHandler())
 		//.failureHandler(new LoginResultHandler())
 		.and().csrf().disable()
-		.addFilterBefore(adminUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+		.headers().xssProtection().disable().frameOptions().disable()
+		.and().addFilterBefore(adminUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 		http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
 			@Override
 			public void commence(HttpServletRequest request, HttpServletResponse response,
 					AuthenticationException authException) throws IOException, ServletException {
-				String method = request.getMethod();
-				//如果是跨域的options 请求则放过，复杂contentType跨域，先发一个options 请求
-				if (!RequestMethod.OPTIONS.name().equalsIgnoreCase(method)) {
-					response.sendError(HttpStatus.NEED_LOGIN.getValue(), "未登录");
-				}
+				response.setStatus(HttpStatus.NEED_LOGIN.getValue());
 			}
 		}).accessDeniedHandler(new AccessDeniedHandler() {
 			@Override
 			public void handle(HttpServletRequest request, HttpServletResponse response,
 					AccessDeniedException accessDeniedException) throws IOException, ServletException {
-				response.sendError(HttpStatus.NEED_PERMISSION.getValue(), "无权限");
+				response.setStatus(HttpStatus.NEED_PERMISSION.getValue());
 			}
 		});
 	}

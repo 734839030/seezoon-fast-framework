@@ -1,0 +1,24 @@
+.ml0{
+	margin-left: 0px;
+}
+.undisplay{
+	display: none;
+}
+.pd10{
+	padding: 10px;
+}
+.mg10{
+	margin: 10px;
+}
+.sf-permission-ctl{
+	display: none;
+}
+
+/* Limit image width to avoid overflow the container */
+img {
+  max-width: 100%; /* This rule is very important, please do not ignore this! */
+}
+
+body {
+	background-color: #ecf0f5;
+}

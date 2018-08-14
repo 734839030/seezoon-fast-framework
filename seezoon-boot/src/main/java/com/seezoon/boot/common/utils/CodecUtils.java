@@ -68,6 +68,10 @@ public class CodecUtils {
 		return DigestUtils.sha256Hex(data);
 	}
 	public static void main(String[] args) {
-		System.out.println(sha256("123456" + "rNBdNtjuefmwLGzXjHoN"));
+		String s = "123456rNBdNtjuefmwLGzXjHoN";
+		for (int i = 0;i<16 ;i++) {
+			s = sha256(s);
+		}
+		System.out.println(s);
 	}
 }

@@ -16,24 +16,25 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import com.alibaba.fastjson.JSON;
 import com.seezoon.admin.modules.sys.service.LoginSecurityService;
 import com.seezoon.boot.context.dto.ResponeModel;
 
-public class LoginResultHandler implements AuthenticationSuccessHandler,AuthenticationFailureHandler{
+public class LoginResultHandler implements AuthenticationSuccessHandler,AuthenticationFailureHandler,LogoutSuccessHandler {
 
 	@Autowired
 	private LoginSecurityService loginSecurityService;
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-		String loginName = request.getParameter("username");
+		String loginName = this.obtainUsername(request);
 		ResponeModel result = ResponeModel.error(exception.getMessage());
 		if (exception instanceof UsernameNotFoundException) {
 			result.setResponeMsg("账户密码错误,连续错误5次将锁定24小时");
-			loginSecurityService.incrementLoginFailTimes(loginName);
 		} else if (exception instanceof BadCredentialsException) {
+			loginSecurityService.incrementLoginFailTimes(loginName);
 			result.setResponeMsg("账户密码错误,连续错误5次将锁定24小时");
 		} else if (exception instanceof LockedException) {
 			result.setResponeMsg("账户已被禁用");
@@ -45,6 +46,8 @@ public class LoginResultHandler implements AuthenticationSuccessHandler,Authenti
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
 		ResponeModel ok = ResponeModel.ok();
+		String loginName = this.obtainUsername(request);
+		loginSecurityService.clearLoginFailTimes(loginName);
 		this.print(response, JSON.toJSONString(ok));
 	}
 
@@ -55,4 +58,15 @@ public class LoginResultHandler implements AuthenticationSuccessHandler,Authenti
 		writer.print(content);
 		writer.close();
 	}
+	private String obtainUsername(HttpServletRequest request) {
+		return request.getParameter("username");
+	}
+
+	@Override
+	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+			throws IOException, ServletException {
+		ResponeModel ok = ResponeModel.ok();
+		this.print(response, JSON.toJSONString(ok));
+	}
+	
 }

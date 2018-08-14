@@ -53,12 +53,6 @@ public class UserController extends BaseController {
 		return ResponeModel.ok(menus);
 	}
 
-	@PostMapping("/logout.do")
-	public ResponeModel logout() {
-		//SecurityUtils.logout();
-		return ResponeModel.ok();
-	}
-
 	@PostMapping("/getUserInfo.do")
 	public ResponeModel getUserInfo() {
 		String userId = SecurityUtils.getUserId();
