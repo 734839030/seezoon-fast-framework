@@ -50,13 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					AuthenticationException authException) throws IOException, ServletException {
 				response.setStatus(HttpStatus.NEED_LOGIN.getValue());
 			}
-		}).accessDeniedHandler(new AccessDeniedHandler() {
-			@Override
-			public void handle(HttpServletRequest request, HttpServletResponse response,
-					AccessDeniedException accessDeniedException) throws IOException, ServletException {
-				response.setStatus(HttpStatus.NEED_PERMISSION.getValue());
-			}
-		});
+		}).accessDeniedHandler(new AccessDeniedHandlerAdvice());//加了全局的@exceptionHandler  这个导致无效了,内部使用adviceController解决
 	}
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
