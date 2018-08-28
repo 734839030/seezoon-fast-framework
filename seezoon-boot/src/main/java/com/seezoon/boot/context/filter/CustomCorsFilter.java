@@ -18,7 +18,9 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * @author hdf 2018年4月7日
+ * 被spring boot 自带的跨越替代
  */
+@Deprecated 
 public class CustomCorsFilter implements Filter {
 
 	protected Logger logger = LoggerFactory.getLogger(CustomCorsFilter.class);

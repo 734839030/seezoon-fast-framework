@@ -17,6 +17,7 @@ public class User implements Serializable {
 	private String loginName;
 	private String name;
 	private String status;
+	private String dsf;
 	
 	private List<SysRole> roles;
 
@@ -28,7 +29,6 @@ public class User implements Serializable {
 		this.loginName = loginName;
 		this.name = name;
 		this.status = status;
-
 	}
 
 
@@ -89,6 +89,16 @@ public class User implements Serializable {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+
+	public String getDsf() {
+		return dsf;
+	}
+
+
+	public void setDsf(String dsf) {
+		this.dsf = dsf;
 	}
 
 }

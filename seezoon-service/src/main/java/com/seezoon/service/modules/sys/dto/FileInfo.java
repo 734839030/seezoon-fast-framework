@@ -1,4 +1,4 @@
-package com.seezoon.admin.common.file.beans;
+package com.seezoon.service.modules.sys.dto;
 
 /**
  * 文件信息

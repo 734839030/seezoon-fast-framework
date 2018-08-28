@@ -39,8 +39,7 @@ public class DataPermissionBuilder {
 	 */
 	private static final String CUSTOM_DEPT = "4";
 
-	public static String build(String tableAlias) {
-		User user = SecurityUtils.getUser();
+	public static String build(User user) {
 		List<SysRole> roles = user.getRoles();
 		String currentUser = user.getUserId();
 		String deptId = user.getDeptId();
@@ -49,8 +48,10 @@ public class DataPermissionBuilder {
 		for (SysRole role : roles) {
 			mergeDataScope.add(role.getDataScope());
 		}
+		//已处理过的数据权限
+		Set<String> handled = Sets.newHashSet();
 		//多个角色数据权限取OR ,包含关系自动跳过
-		if (!SecurityUtils.isSuperAdmin() && null != roles && !roles.isEmpty() && !mergeDataScope.contains(ALL)) {
+		if (!SecurityUtils.isSuperAdmin(user.getUserId()) && null != roles && !roles.isEmpty() && !mergeDataScope.contains(ALL)) {
 			for (SysRole role : roles) {
 				String dataScope = role.getDataScope();
 				if (CURRENT_DEPT.equals(dataScope) && mergeDataScope.contains(CURRENT_DEPT_LOW_LEVEL)) {
@@ -59,10 +60,12 @@ public class DataPermissionBuilder {
 				if (CURRENT_USER.equals(dataScope) && mergeDataScope.containsAll(Arrays.asList(new String[]{CURRENT_DEPT_LOW_LEVEL,CURRENT_DEPT}))) {
 					continue;
 				}
-				sb.append(" or ");
-				if (StringUtils.isNotEmpty(tableAlias)) {
-					sb.append(tableAlias).append(".");
+				//已经处理过的
+				if (handled.contains(dataScope)) {
+					continue;
 				}
+				sb.append(" or ");
+				sb.append("{TABLE_ALIAS}");
 				// 因为mysql update delete 子查询限制，最好对子查询取别名
 				if (CURRENT_DEPT_LOW_LEVEL.equals(dataScope)) {//本部门及以下
 					sb.append("create_by ").append("in (select sf_alias.id from (select su.id from sys_user su left join sys_dept sd on su.dept_id = sd.id  where sd.id= '")

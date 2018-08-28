@@ -1,13 +1,8 @@
 package com.seezoon.service.modules.sys.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
@@ -16,8 +11,6 @@ import org.springframework.util.Assert;
 
 import com.seezoon.boot.common.Constants;
 import com.seezoon.boot.common.service.BaseService;
-import com.seezoon.boot.common.utils.FreeMarkerUtils;
-import com.seezoon.boot.context.exception.ServiceException;
 import com.seezoon.service.modules.sys.dto.DbTable;
 import com.seezoon.service.modules.sys.dto.DbTableColumn;
 import com.seezoon.service.modules.sys.dto.GenColumnInfo;
@@ -46,8 +39,8 @@ public class GeneratorService extends BaseService{
 	 * 待生成模板
 	 */
 	public static final String[] ftls = {"gen/mapper.xml.ftl","gen/entity.java.ftl","gen/dao.java.ftl","gen/service.java.ftl","gen/controller.java.ftl","gen/page.html.ftl","gen/javascript.js.ftl","gen/menu.sql.ftl"};
-	
-	private static final String javaFolder = "/seezoon-code/src/main/java/com/seezoon/framework/modules/";
+	private static final String javaControllerFolder = "/seezoon-code/src/main/java/com/seezoon/admin/modules/";
+	private static final String javaServiceFolder = "/seezoon-code/src/main/java/com/seezoon/service/modules/";
 	private static final String resourcesFolder = "/seezoon-code/src/main/resources/";
 	private static final String staticFolder = "/seezoon-code/src/main/webapp/static/src/admin/";
 
@@ -171,13 +164,13 @@ public class GeneratorService extends BaseService{
 		String functionName = sysGen.getFunctionName();
 
 		if (ftl.contains("entity.java")) {
-			name = javaFolder + moduleName + "/entity/" + className + ".java";
+			name = javaServiceFolder + moduleName + "/entity/" + className + ".java";
 		} else if (ftl.contains("dao.java")) {
-			name = javaFolder + moduleName + "/dao/" + className + "Dao.java";
+			name = javaServiceFolder + moduleName + "/dao/" + className + "Dao.java";
 		} else if (ftl.contains("service.java")) {
-			name = javaFolder + moduleName + "/service/" + className + "Service.java";
+			name = javaServiceFolder + moduleName + "/service/" + className + "Service.java";
 		} else if (ftl.contains("controller.java")) {
-			name = javaFolder + moduleName + "/web/" + className + "Controller.java";
+			name = javaControllerFolder + moduleName + "/web/" + className + "Controller.java";
 		} else if (ftl.contains("mapper.xml")) {
 			name = resourcesFolder + "mappings/" + moduleName + "/" + className + "Mapper.xml";
 		} else if (ftl.contains("page.html")) {

@@ -1,9 +1,9 @@
-package com.seezoon.framework.modules.${moduleName}.service;
+package com.seezoon.service.modules.${moduleName}.service;
 
 import org.springframework.stereotype.Service;
-import com.seezoon.framework.common.service.CrudService;
-import com.seezoon.framework.modules.${moduleName}.dao.${className}Dao;
-import com.seezoon.framework.modules.${moduleName}.entity.${className};
+import com.seezoon.boot.common.service.CrudService;
+import com.seezoon.service.modules.${moduleName}.dao.${className}Dao;
+import com.seezoon.service.modules.${moduleName}.entity.${className};
 
 /**
  * ${menuName}Service

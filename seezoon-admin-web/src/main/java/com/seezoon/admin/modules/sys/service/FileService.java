@@ -10,10 +10,11 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import com.seezoon.admin.common.file.beans.FileInfo;
+
 import com.seezoon.admin.common.file.handler.FileHandler;
 import com.seezoon.boot.common.service.BaseService;
 import com.seezoon.boot.common.utils.DateUtils;
+import com.seezoon.service.modules.sys.dto.FileInfo;
 import com.seezoon.service.modules.sys.entity.SysFile;
 import com.seezoon.service.modules.sys.service.SysFileService;
 

@@ -26,12 +26,16 @@ public class LoginSecurityService extends BaseService {
 
 	public Long getLoginFailCount(String loginName) {
 		try {
-			return valueOperations.get(LOCK_PREFIX + loginName);
+			Long cnt = valueOperations.get(LOCK_PREFIX + loginName);
+			return null == cnt ? 0:cnt;
 		} finally {
 			valueOperations.getOperations().expire(LOCK_PREFIX + loginName, 24, TimeUnit.HOURS);
 		}
 	}
 
+	public boolean isLocked(String loginName) {
+		return  getLoginFailCount(loginName) >= 5;
+	}
 	public Long incrementLoginFailTimes(String loginName) {
 		try {
 			Long increment = valueOperations.increment(LOCK_PREFIX + loginName, 1);

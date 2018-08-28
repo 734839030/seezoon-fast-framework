@@ -27,13 +27,11 @@
 		<dependency>
 			<groupId>com.aliyun.oss</groupId>
 			<artifactId>aliyun-sdk-oss</artifactId>
-			<version>${aliyun.sdk.oss.version}</version>
 		</dependency>
 		<!-- elastic job -->
 			<dependency>
 				<groupId>com.dangdang</groupId>
 				<artifactId>elastic-job-lite-spring</artifactId>
-				<version>${elastic.job.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
@@ -51,6 +49,17 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-devtools</artifactId>
+			</dependency>
+			<dependency>
+			<groupId>eu.bitwalker</groupId>
+			<artifactId>UserAgentUtils</artifactId>
+		</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>
+					spring-boot-configuration-processor
+				</artifactId>
+				<optional>true</optional>
 			</dependency>
 	</dependencies>
 	<!-- 依赖模块不能用spring 插件打包，否则无法依赖成功 -->

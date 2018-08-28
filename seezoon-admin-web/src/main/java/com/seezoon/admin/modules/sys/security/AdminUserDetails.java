@@ -17,13 +17,14 @@ public class AdminUserDetails implements UserDetails {
 
 	private User user;
 	private String passowrd;
-
+	private boolean locked; 
 	private List<GrantedAuthority> authorities;
 	
-	public AdminUserDetails(User user, String passowrd, List<GrantedAuthority> authorities) {
+	public AdminUserDetails(User user, String passowrd, List<GrantedAuthority> authorities,boolean locked) {
 		this.user = user;
 		this.passowrd = passowrd;
 		this.authorities = authorities;
+		this.locked = locked;
 	}
 
 	@Override
@@ -48,7 +49,7 @@ public class AdminUserDetails implements UserDetails {
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return !SysUser.STATUS_STOP.equals(user.getStatus());
+		return !locked;
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class AdminUserDetails implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return !SysUser.STATUS_STOP.equals(user.getStatus());
 	}
 
 	public User getUser() {
@@ -68,5 +69,6 @@ public class AdminUserDetails implements UserDetails {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
 
 }

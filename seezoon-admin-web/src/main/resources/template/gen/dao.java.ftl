@@ -1,7 +1,7 @@
-package com.seezoon.framework.modules.${moduleName}.dao;
+package com.seezoon.service.modules.${moduleName}.dao;
 
-import com.seezoon.framework.common.dao.CrudDao;
-import com.seezoon.framework.modules.${moduleName}.entity.${className};
+import com.seezoon.boot.common.dao.CrudDao;
+import com.seezoon.service.modules.${moduleName}.entity.${className};
 
 /**
  * ${menuName}Dao

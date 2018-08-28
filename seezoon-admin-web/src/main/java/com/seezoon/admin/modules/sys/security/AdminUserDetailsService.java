@@ -12,10 +12,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
 
+import com.seezoon.admin.modules.sys.service.LoginSecurityService;
+import com.seezoon.admin.modules.sys.utils.DataPermissionBuilder;
 import com.seezoon.boot.common.Constants;
 import com.seezoon.service.modules.sys.entity.SysMenu;
+import com.seezoon.service.modules.sys.entity.SysRole;
 import com.seezoon.service.modules.sys.entity.SysUser;
 import com.seezoon.service.modules.sys.service.SysMenuService;
+import com.seezoon.service.modules.sys.service.SysRoleService;
 import com.seezoon.service.modules.sys.service.SysUserService;
 
 public class AdminUserDetailsService implements UserDetailsService{
@@ -24,6 +28,10 @@ public class AdminUserDetailsService implements UserDetailsService{
 	private SysUserService sysUserService;
 	@Autowired
 	private SysMenuService sysMenuService;
+	@Autowired
+	private SysRoleService sysRoleService;
+	@Autowired
+	private LoginSecurityService loginSecurityService;
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Assert.hasLength(username, "username为空");
@@ -32,7 +40,11 @@ public class AdminUserDetailsService implements UserDetailsService{
 			throw new UsernameNotFoundException(username + "账号不存在");
 		}
 		User user = new User(sysUser.getId(), sysUser.getDeptId(), sysUser.getDeptName(), sysUser.getLoginName(), sysUser.getName(), sysUser.getStatus());
-		AdminUserDetails adminUserDetails = new AdminUserDetails(user, sysUser.getPassword(), getAuthorities(sysUser.getId()));
+		List<SysRole> roles = sysRoleService.findByUserId(sysUser.getId());
+		user.setRoles(roles);
+		String dsf =DataPermissionBuilder.build(user);
+		user.setDsf(dsf);
+		AdminUserDetails adminUserDetails = new AdminUserDetails(user, sysUser.getPassword(), getAuthorities(sysUser.getId()), !SecurityUtils.isSuperAdmin(user.getUserId()) && loginSecurityService.isLocked(username));
 		return adminUserDetails;
 	}
 	

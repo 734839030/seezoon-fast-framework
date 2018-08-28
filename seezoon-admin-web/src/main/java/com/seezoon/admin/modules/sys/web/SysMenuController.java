@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
 import com.seezoon.admin.common.utils.TreeHelper;
 import com.seezoon.boot.common.Constants;
 import com.seezoon.boot.common.web.BaseController;
@@ -75,8 +74,7 @@ public class SysMenuController extends BaseController {
 	@PreAuthorize("hasAuthority('sys:menu:save')")
 	@PostMapping("/batchSave.do")
 	public ResponeModel batchSave(@RequestBody List<SysMenu> list ) {
-		//直接用list接收到的json 参数实际上是jsonObject，强转到SysMenu 会报错,下列性能不好，因为不想循环List 转化
-		sysMenuService.batchSave(JSON.parseArray(JSON.toJSONString(list), SysMenu.class));
+		sysMenuService.batchSave(list);
 		return ResponeModel.ok();
 	}
 	@PostMapping("/qryByRoleId.do")

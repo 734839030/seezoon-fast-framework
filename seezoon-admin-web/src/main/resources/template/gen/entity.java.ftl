@@ -1,6 +1,6 @@
-package com.seezoon.framework.modules.${moduleName}.entity;
+package com.seezoon.service.modules.${moduleName}.entity;
 
-import com.seezoon.framework.common.entity.BaseEntity;
+import com.seezoon.boot.common.entity.BaseEntity;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 <#if hasBigDecimal >
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 </#if>
 <#if hasFileUpload >
-import com.seezoon.framework.common.file.beans.FileInfo;
+import com.seezoon.service.modules.sys.dto.FileInfo;
 import java.util.List;
 </#if>
 /**

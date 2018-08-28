@@ -20,7 +20,7 @@ public class FilterConfiguration {
 
 
 	/**
-	 * 利用spring boot 的跨域
+	 * 这个也可以，但是最后利用spring boot 的跨域
 	 * @return
 	 */
 //	@Bean

@@ -60,8 +60,14 @@ public class QueryEntity implements Serializable{
 	public String getDsf() {
 		// /a 路径的后端请求需要后端需要，前端不需要
 		AdminUser user = AdminThreadContext.getUser();
-		if (user != null && StringUtils.isEmpty(dsf) && this.openDsf()) {
+		if (user != null && StringUtils.isNotEmpty(user.getDsf()) && StringUtils.isEmpty(dsf) && this.openDsf()) {
 			dsf = user.getDsf();
+			//填充别名
+			if (StringUtils.isEmpty(this.getTableAlias())) {
+				dsf = dsf.replace("{TABLE_ALIAS}", this.getTableAlias()+ ".");
+			}  else {
+				dsf = dsf.replace("{TABLE_ALIAS}", "");
+			}
 		}
 		return dsf;
 	}

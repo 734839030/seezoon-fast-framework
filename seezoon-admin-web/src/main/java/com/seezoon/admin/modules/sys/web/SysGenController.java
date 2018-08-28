@@ -3,6 +3,7 @@ package com.seezoon.admin.modules.sys.web;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -61,8 +62,8 @@ public class SysGenController extends BaseController {
 	@PostMapping("/save.do")
 	public ResponeModel save(@Validated @RequestBody SysGen sysGen, BindingResult bindingResult) {
 		List<GenColumnInfo> columnInfos = sysGen.getColumnInfos();
-		Collections.sort(columnInfos);
 		sysGen.setColumns(JSON.toJSONString(columnInfos));
+		Collections.sort(columnInfos);
 		int cnt = sysGenService.save(sysGen);
 		return ResponeModel.ok(cnt);
 	}
@@ -71,8 +72,8 @@ public class SysGenController extends BaseController {
 	@PostMapping("/update.do")
 	public ResponeModel update(@Validated @RequestBody SysGen sysGen, BindingResult bindingResult) {
 		List<GenColumnInfo> columnInfos = sysGen.getColumnInfos();
-		Collections.sort(columnInfos);
 		sysGen.setColumns(JSON.toJSONString(columnInfos));
+		Collections.sort(columnInfos);
 		int cnt = sysGenService.updateSelective(sysGen);
 		return ResponeModel.ok(cnt);
 	}
@@ -106,7 +107,7 @@ public class SysGenController extends BaseController {
 		response.setContentLength(codeGen.length);
 		ServletOutputStream output = response.getOutputStream();
 		IOUtils.write(codeGen, output);
-		IOUtils.closeQuietly(output);
+		output.close();
 	}
 	private byte[] zipCode(SysGen sysGen) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -115,7 +116,7 @@ public class SysGenController extends BaseController {
 			String content = FreeMarkerUtils.renderTemplate(ftl, sysGen);
 			logger.info("ftl {}:\r\n{}",ftl,content);
 			zos.putNextEntry(new ZipEntry(generatorService.getZipEntryName(ftl,sysGen)));
-			IOUtils.write(content, zos);
+			IOUtils.write(content, zos,Charset.forName("UTF-8"));
 			zos.closeEntry();
 		}
 		//这个地方有点反人类，按道理应该在取到byte[] 后关闭，测试，zos.flush 也无效，顾提前关闭，将流都刷入到数组中。

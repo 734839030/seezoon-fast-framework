@@ -23,12 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Lists;
-import com.seezoon.admin.common.file.beans.FileInfo;
 import com.seezoon.admin.modules.sys.service.FileService;
 import com.seezoon.boot.common.utils.CodecUtils;
 import com.seezoon.boot.common.utils.IdGen;
 import com.seezoon.boot.common.web.BaseController;
 import com.seezoon.boot.context.dto.ResponeModel;
+import com.seezoon.service.modules.sys.dto.FileInfo;
 import com.seezoon.service.modules.sys.entity.SysFile;
 
 @RestController

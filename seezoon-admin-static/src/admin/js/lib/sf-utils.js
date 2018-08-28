@@ -170,20 +170,25 @@ $(function() {
 			$(".sf-permission-ctl").each(function(i, v) {
 				// 按钮权限控制
 				var permission = $(v).data("sf-permission");
-				// 支持父子权限判断
+				// 暂不支持父子权限判断
 				if (permission) {
-					var p = permission.split(":");
-					var hp = [];
-					for (var i = 0; i < p.length; i++) {
-						hp.push(handlePermission(i, p));
+					var value = sessionStorage.getItem("model.permission." + permission);
+					if ('1' == value) {
+						$(this).show();
 					}
-					for (var i = 0; i < hp.length; i++) {
-						var value = sessionStorage.getItem("model.permission." + hp[i]);
-						if ('1' == value) {
-							$(this).show();
-							break;
-						}
-					}
+					
+//					var p = permission.split(":");
+//					var hp = [];
+//					for (var i = 0; i < p.length; i++) {
+//						hp.push(handlePermission(i, p));
+//					}
+//					for (var i = 0; i < hp.length; i++) {
+//						var value = sessionStorage.getItem("model.permission." + hp[i]);
+//						if ('1' == value) {
+//							$(this).show();
+//							break;
+//						}
+//					}
 				}
 			});
 		},
