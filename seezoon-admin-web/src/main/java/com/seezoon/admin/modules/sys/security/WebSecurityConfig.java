@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,11 +18,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
 import com.seezoon.admin.modules.sys.utils.HttpStatus;
 
@@ -38,8 +35,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/public/**").permitAll()
 		.antMatchers((adminPath + "/**")).authenticated()
 		.antMatchers(HttpMethod.OPTIONS).permitAll()//跨域的
+		.and().rememberMe().key("seezoon").rememberMeParameter("rememberMe").tokenValiditySeconds(7 * 24 * 60 * 60).useSecureCookie(true).userDetailsService(adminUserDetailsService())
 		.and().formLogin().loginProcessingUrl(adminPath + "/login.do").permitAll()//.successHandler(new LoginResultHandler())
-		.and().logout().logoutUrl(adminPath + "/user/logout.do").logoutSuccessHandler(loginResultHandler())
+		.and().logout().logoutUrl(adminPath + "/user/logout.do").logoutSuccessHandler(loginResultHandler()).deleteCookies("remember-me")
 		//.failureHandler(new LoginResultHandler())
 		.and().csrf().disable()
 		.headers().xssProtection().disable().frameOptions().disable()
@@ -56,14 +54,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(adminUserDetailsService()).passwordEncoder(new AdminPasswordEncoder());
 	}
+	/**
+	 * 自定义了UsernamePasswordAuthenticationToken filter 可以添加自定功能
+	 * @return
+	 * @throws Exception
+	 */
 	@Bean
 	public AdminUsernamePasswordAuthenticationFilter adminUsernamePasswordAuthenticationFilter() throws Exception {
 		AdminUsernamePasswordAuthenticationFilter adminUsernamePasswordAuthenticationFilter = new AdminUsernamePasswordAuthenticationFilter(adminPath + "/login.do");
 		adminUsernamePasswordAuthenticationFilter.setAuthenticationManager(this.authenticationManager());
 		adminUsernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler(loginResultHandler());
 		adminUsernamePasswordAuthenticationFilter.setAuthenticationFailureHandler(loginResultHandler());
+		adminUsernamePasswordAuthenticationFilter.setRememberMeServices(tokenBasedRememberMeServices());
 		return adminUsernamePasswordAuthenticationFilter;
 	}
+	/**
+	 * 由于自定义了UsernamePasswordAuthenticationFilter 所有要把remember的策略传进去
+	 * @return
+	 */
+    public TokenBasedRememberMeServices tokenBasedRememberMeServices() {
+        TokenBasedRememberMeServices tbrms = new TokenBasedRememberMeServices("seezoon", adminUserDetailsService());
+        // 设置cookie过期时间为2天
+        tbrms.setTokenValiditySeconds(60 * 60 * 24 * 7);
+        tbrms.setParameter("rememberMe");
+        return tbrms;
+    }
+
 	@Bean
 	public AdminUserDetailsService adminUserDetailsService() {
 		AdminUserDetailsService adminUserDetailsService = new AdminUserDetailsService();
