@@ -22,12 +22,10 @@ public class FreeMarkerUtils {
 		Configuration cfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
 		cfg.setDefaultEncoding("utf-8");
 		ClassPathResource cps = new ClassPathResource(directory);
-		try {
-			cfg.setDirectoryForTemplateLoading(cps.getFile());
-			return cfg;
-		} catch (IOException e) {
-			throw new ServiceException(e);
-		}
+		//jar中拿到到file路径spring 认识，freemarks不认识
+		//cfg.setDirectoryForTemplateLoading(cps.getFile());
+		cfg.setClassLoaderForTemplateLoading(FreeMarkerUtils.class.getClassLoader(), DEFAULT_DIRECTORY);
+		return cfg;
 	}
 
 	/**
